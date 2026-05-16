@@ -3,14 +3,14 @@ import joblib
 import pandas as pd
 import numpy as np
 
-# إعدادات الصفحة
+# 1. إعدادات الصفحة الافتراضية
 st.set_page_config(
     page_title="Telecom Customer Churn Predictor",
     page_icon="📊",
     layout="wide"
 )
 
-# تحميل الموديل (تأكد أن ملف الموديل في نفس الفولدر أو اكتب مساره الصحيح)
+# 2. تحميل الموديل وتخزينه في الكاش لسرعة الأداء
 @st.cache_resource
 def load_model():
     return joblib.load('churn_model (1).joblib')
@@ -22,19 +22,19 @@ except Exception as e:
     st.error(f"خطأ في تحميل ملف الموديل: {e}")
     model_loaded = False
 
-# العنوان الرئيسي للتطبيق
+# 3. العنوان الرئيسي للـ Dashboard
 st.title("📱 AI-Enhanced Data Pipeline for Customer Churn Prediction")
 st.markdown("---")
 
 if model_loaded:
-    # تقسيم لوحة التحكم إلى توبيبات (Tabs) لتقديم احترافي أمام اللجنة
+    # تقسيم الـ Dashboard إلى علامات تبويب (Tabs) للعرض الاحترافي
     tab1, tab2 = st.tabs(["🔮 Single Customer Prediction", "📈 Financial Feasibility & ROI"])
     
     with tab1:
         st.header("Single Customer Risk Assessment")
         st.subheader("Enter Customer Usage & Network Metrics")
         
-        # تقسيم المدخلات في أعمدة ليكون المظهر منظمًا
+        # تقسيم واجهة الإدخال إلى 3 أعمدة متناسقة
         col1, col2, col3 = st.columns(3)
         
         with col1:
@@ -60,45 +60,57 @@ if model_loaded:
             region_avg_range = st.number_input("Region Avg Range", min_value=0.0, value=2.5)
             region_avg_samples = st.number_input("Region Avg Samples", min_value=0.0, value=150.0)
             region_coverage_index = st.number_input("Region Coverage Index", min_value=0.0, max_value=1.0, value=0.85)
-            region_network_quality_score = st.number_input("Network Quality Score", min_value=0.0, max_value=100.0, value=75.0)
+            # تم تعديل اسم المتغير هنا ليطابق مخرجات الموديل بدقة
+            arr_network_quality_score = st.number_input("Network Quality Score", min_value=0.0, max_value=100.0, value=75.0)
             
         st.markdown("---")
         
-        # زرار التوقع
+        # زر تشغيل التنبؤ والمحاكاة
         if st.button("Analyze Customer Churn Risk", type="primary"):
-            # تجميع البيانات في DataFrame بنفس أسماء الـ features اللي الموديل متدرب عليها بالظبط
+            # تجميع المدخلات في قاموس بأسماء الـ features المطابقة للموديل تماماً
             input_dict = {
-                'montant': [montant], 'frequence_rech': [frequence_rech], 'revenue': [revenue],
-                'arpu_segment': [arpu_segment], 'frequence': [frequence], 'data_volume': [data_volume],
-                'on_net': [on_net], 'orange': [orange], 'tigo': [tigo], 'regularity': [regularity],
-                'freq_top_pack': [freq_top_pack], 'region_tower_count': [region_tower_count],
-                'region_avg_range': [region_avg_range], 'region_avg_samples': [region_avg_samples],
+                'montant': [montant], 
+                'frequence_rech': [frequence_rech], 
+                'revenue': [revenue],
+                'arpu_segment': [arpu_segment], 
+                'frequence': [frequence], 
+                'data_volume': [data_volume],
+                'on_net': [on_net], 
+                'orange': [orange], 
+                'tigo': [tigo], 
+                'regularity': [regularity],
+                'freq_top_pack': [freq_top_pack], 
+                'region_tower_count': [region_tower_count],
+                'region_avg_range': [region_avg_range], 
+                'region_avg_samples': [region_avg_samples],
                 'region_coverage_index': [region_coverage_index],
-                'region_network_quality_score': [region_network_quality_score]
+                # تم تعديل اسم المفتاح (Key) هنا ليطابق التدريب الأساسي للموديل
+                'arr_network_quality_score': [arr_network_quality_score]
             }
             
+            # تحويل البيانات إلى DataFrame
             input_df = pd.DataFrame(input_dict)
             
-            # عمل التوقع وحساب الاحتمالية
+            # تنفيذ التنبؤ واستخراج الاحتمالات من الـ Pipeline
             prediction = model.predict(input_df)[0]
-            probability = model.predict_proba(input_df)[0][1] # احتمالية الـ Churn
+            probability = model.predict_proba(input_df)[0][1]
             
-            # عرض النتيجة بشكل مرئي واضح
+            # عرض النتائج بشكل بصري منسق للجنة
             st.subheader("Analysis Results")
             if prediction == 1 or probability > 0.5:
                 st.error(f"⚠️ High Risk Client! Churn Probability: {probability:.2%}")
                 st.progress(float(probability))
-                st.write("Recommendation: Trigger retention campaign immediately (e.g., offer a customized top pack or discount).")
+                st.write("**Recommendation:** Trigger retention campaign immediately (e.g., offer a customized top pack or discount).")
             else:
                 st.success(f"✅ Loyal Client. Churn Probability: {probability:.2%}")
                 st.progress(float(probability))
-                st.write("Recommendation: Maintain standard relationship and monitor usage regularity.")
+                st.write("**Recommendation:** Maintain standard relationship and monitor usage regularity.")
 
     with tab2:
         st.header("Financial Feasibility & ROI Analysis")
         st.write("Simulation of saving customers using this predictive AI model vs standard operations.")
         
-        # مدخلات الحسبة المالية
+        # مدخلات الحسابات المالية والجدوى لمشروع التخرج
         c1, c2 = st.columns(2)
         with c1:
             avg_customer_value = st.number_input("Average Monthly Revenue per User (ARPU)", value=150.0)
@@ -107,7 +119,7 @@ if model_loaded:
             retention_cost = st.number_input("Cost of Retention Offer per Customer", value=30.0)
             model_accuracy_retention = st.slider("Estimated Model Success Rate in Retention (%)", 0, 100, 70)
             
-        # الحسابات
+        # العمليات الحسابية الخاصة بالجدوى المالية
         total_lost_revenue = total_churn_customers * avg_customer_value
         saved_customers = int(total_churn_customers * (model_accuracy_retention / 100))
         revenue_saved = saved_customers * avg_customer_value
@@ -115,7 +127,7 @@ if model_loaded:
         net_profit_roi = revenue_saved - total_campaign_cost
         roi_percentage = (net_profit_roi / total_campaign_cost) * 100 if total_campaign_cost > 0 else 0
         
-        # عرض الأرقام المالية للجنة التحكيم
+        # عرض مؤشرات الأداء المالي (KPIs) للجنة التحكيم
         st.markdown("### 📊 Simulated Business Impact")
         kpi1, kpi2, kpi3 = st.columns(3)
         kpi1.metric("Potential Revenue Lost", f"${total_lost_revenue:,.2f}")
