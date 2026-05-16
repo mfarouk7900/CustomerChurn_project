@@ -64,8 +64,8 @@ if model_loaded:
         st.markdown("---")
         
         if st.button("Analyze Customer Churn Risk", type="primary"):
-            # بناء جدول البيانات اليدوي بالترتيب الحرفي المطابق للموديل بالملي
-            input_df = pd.DataFrame([[
+            # تجميع البيانات في مصفوفة Numpy معزولة تماماً عن الأسماء والـ Headers
+            input_features = np.array([[
                 montant, 
                 frequence_rech, 
                 revenue, 
@@ -83,16 +83,11 @@ if model_loaded:
                 region_coverage_index, 
                 region_network_quality_score, 
                 arr_network_quality_score
-            ]], columns=[
-                'montant', 'frequence_rech', 'revenue', 'arpu_segment', 'frequence',
-                'data_volume', 'on_net', 'orange', 'tigo', 'regularity', 'freq_top_pack',
-                'region_tower_count', 'region_avg_range', 'region_avg_samples',
-                'region_coverage_index', 'region_network_quality_score', 'arr_network_quality_score'
-            ])
+            ]], dtype=np.float64)
             
-            # تنفيذ التنبؤ
-            prediction = model.predict(input_df)[0]
-            probability = model.predict_proba(input_df)[0][1]
+            # تنفيذ التنبؤ باستخدام المصفوفة المجردة
+            prediction = model.predict(input_features)[0]
+            probability = model.predict_proba(input_features)[0][1]
             
             st.subheader("Analysis Results")
             if prediction == 1 or probability > 0.5:
