@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. تحميل الموديل وتخزينه في الكاش
+# 2. تحميل الموديل وتخزينه في الكاش لسرعة الأداء
 @st.cache_resource
 def load_model():
     return joblib.load('churn_model (1).joblib')
@@ -27,14 +27,14 @@ st.title("📱 AI-Enhanced Data Pipeline for Customer Churn Prediction")
 st.markdown("---")
 
 if model_loaded:
-    # تقسيم الـ Dashboard إلى علامات تبويب (Tabs)
+    # تقسيم الـ Dashboard إلى علامات تبويب (Tabs) للعرض الاحترافي
     tab1, tab2 = st.tabs(["🔮 Single Customer Prediction", "📈 Financial Feasibility & ROI"])
     
     with tab1:
         st.header("Single Customer Risk Assessment")
         st.subheader("Enter Customer Usage & Network Metrics")
         
-        # تقسيم واجهة الإدخال إلى 3 أعمدة
+        # تقسيم واجهة الإدخال إلى 3 أعمدة متناسقة
         col1, col2, col3 = st.columns(3)
         
         with col1:
@@ -60,13 +60,14 @@ if model_loaded:
             region_avg_range = st.number_input("Region Avg Range", min_value=0.0, value=2.5)
             region_avg_samples = st.number_input("Region Avg Samples", min_value=0.0, value=150.0)
             region_coverage_index = st.number_input("Region Coverage Index", min_value=0.0, max_value=1.0, value=0.85)
-            region_network_quality_score = st.number_input("Network Quality Score", min_value=0.0, max_value=100.0, value=75.0)
+            region_network_quality_score = st.number_input("Region Network Quality Score", min_value=0.0, max_value=100.0, value=75.0)
+            arr_network_quality_score = st.number_input("Arr Network Quality Score", min_value=0.0, max_value=100.0, value=70.0)
             
         st.markdown("---")
         
-        # زر تشغيل التنبؤ
+        # زر تشغيل التنبؤ والمحاكاة
         if st.button("Analyze Customer Churn Risk", type="primary"):
-            # تجميع البيانات في قاموس
+            # تجميع المدخلات في قاموس بأسماء الـ features الـ 17 كاملة
             input_dict = {
                 'montant': [montant],
                 'frequence_rech': [frequence_rech],
@@ -83,28 +84,29 @@ if model_loaded:
                 'region_avg_range': [region_avg_range],
                 'region_avg_samples': [region_avg_samples],
                 'region_coverage_index': [region_coverage_index],
-                'region_network_quality_score': [region_network_quality_score]
+                'region_network_quality_score': [region_network_quality_score],
+                'arr_network_quality_score': [arr_network_quality_score]
             }
             
             # تحويل البيانات إلى DataFrame
             input_df = pd.DataFrame(input_dict)
             
-            # الترتيب الداخلي الأصلي المستخرج من ملف الـ joblib بالظبط
+            # الترتيب الـ 17 الإجباري والمستخرج من ملف الـ joblib بالملي
             original_fit_order = [
                 'montant', 'frequence_rech', 'revenue', 'arpu_segment', 'frequence',
                 'data_volume', 'on_net', 'orange', 'tigo', 'regularity', 'freq_top_pack',
                 'region_tower_count', 'region_avg_range', 'region_avg_samples',
-                'region_coverage_index', 'region_network_quality_score'
+                'region_coverage_index', 'region_network_quality_score', 'arr_network_quality_score'
             ]
             
-            # فرض الترتيب الأصلي على الـ DataFrame
+            # فرض الترتيب على الـ DataFrame قبل التمرير للموديل
             input_df = input_df[original_fit_order]
             
-            # تنفيذ التنبؤ
+            # تنفيذ التنبؤ واستخراج الاحتمالات
             prediction = model.predict(input_df)[0]
             probability = model.predict_proba(input_df)[0][1]
             
-            # عرض النتائج
+            # عرض النتائج بشكل بصري منسق
             st.subheader("Analysis Results")
             if prediction == 1 or probability > 0.5:
                 st.error(f"⚠️ High Risk Client! Churn Probability: {probability:.2%}")
