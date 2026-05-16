@@ -60,19 +60,15 @@ if model_loaded:
             region_avg_range = st.number_input("Region Avg Range", min_value=0.0, value=2.5)
             region_avg_samples = st.number_input("Region Avg Samples", min_value=0.0, value=150.0)
             region_coverage_index = st.number_input("Region Coverage Index", min_value=0.0, max_value=1.0, value=0.85)
-            
-            # الموديل متدرب على الكلمتين دول فعملنا ليهم خانتين إدخال قيم افتراضية
-            region_network_quality_score = st.number_input("Region Network Quality Score", min_value=0.0, max_value=100.0, value=75.0)
-            arr_network_quality_score = st.number_input("Arr Network Quality Score", min_value=0.0, max_value=100.0, value=70.0)
+            region_network_quality_score = st.number_input("Network Quality Score", min_value=0.0, max_value=100.0, value=75.0)
             
         st.markdown("---")
         
         # زر تشغيل التنبؤ
         if st.button("Analyze Customer Churn Risk", type="primary"):
-            # ترتيب الـ القاموس هنا متطابق تماماً أبجدياً وبالمسميات المطابقة للـ Pipeline في الموديل
+            # تجميع البيانات في قاموس
             input_dict = {
                 'arpu_segment': [arpu_segment],
-                'arr_network_quality_score': [arr_network_quality_score],
                 'data_volume': [data_volume],
                 'freq_top_pack': [freq_top_pack],
                 'frequence': [frequence],
@@ -93,15 +89,15 @@ if model_loaded:
             # تحويل البيانات إلى DataFrame
             input_df = pd.DataFrame(input_dict)
             
-            # إعادة ترتيب الأعمدة لتكون متطابقة 100% مع ترتيب الـ Pipeline المخزن
+            # الترتيب الأبجدي الصارم الـ 100% اللي الـ Pipeline متوقعه في الصورة بالظبط
             expected_order = [
-                'montant', 'frequence_rech', 'revenue', 'arpu_segment', 'frequence',
-                'data_volume', 'on_net', 'orange', 'tigo', 'regularity', 'freq_top_pack',
-                'region_tower_count', 'region_avg_range', 'region_avg_samples',
-                'region_coverage_index', 'region_network_quality_score', 'arr_network_quality_score'
+                'arpu_segment', 'data_volume', 'freq_top_pack', 'frequence', 
+                'frequence_rech', 'montant', 'on_net', 'orange', 'region_avg_range', 
+                'region_avg_samples', 'region_coverage_index', 'region_network_quality_score', 
+                'region_tower_count', 'regularity', 'revenue', 'tigo'
             ]
             
-            # إعادة الترتيب الإجباري قبل التمرير للموديل
+            # تطبيق الترتيب
             input_df = input_df[expected_order]
             
             # تنفيذ التنبؤ
