@@ -68,37 +68,37 @@ if model_loaded:
         if st.button("Analyze Customer Churn Risk", type="primary"):
             # تجميع البيانات في قاموس
             input_dict = {
-                'arpu_segment': [arpu_segment],
-                'data_volume': [data_volume],
-                'freq_top_pack': [freq_top_pack],
-                'frequence': [frequence],
-                'frequence_rech': [frequence_rech],
                 'montant': [montant],
+                'frequence_rech': [frequence_rech],
+                'revenue': [revenue],
+                'arpu_segment': [arpu_segment],
+                'frequence': [frequence],
+                'data_volume': [data_volume],
                 'on_net': [on_net],
                 'orange': [orange],
+                'tigo': [tigo],
+                'regularity': [regularity],
+                'freq_top_pack': [freq_top_pack],
+                'region_tower_count': [region_tower_count],
                 'region_avg_range': [region_avg_range],
                 'region_avg_samples': [region_avg_samples],
                 'region_coverage_index': [region_coverage_index],
-                'region_network_quality_score': [region_network_quality_score],
-                'region_tower_count': [region_tower_count],
-                'regularity': [regularity],
-                'revenue': [revenue],
-                'tigo': [tigo]
+                'region_network_quality_score': [region_network_quality_score]
             }
             
             # تحويل البيانات إلى DataFrame
             input_df = pd.DataFrame(input_dict)
             
-            # الترتيب الأبجدي الصارم الـ 100% اللي الـ Pipeline متوقعه في الصورة بالظبط
-            expected_order = [
-                'arpu_segment', 'data_volume', 'freq_top_pack', 'frequence', 
-                'frequence_rech', 'montant', 'on_net', 'orange', 'region_avg_range', 
-                'region_avg_samples', 'region_coverage_index', 'region_network_quality_score', 
-                'region_tower_count', 'regularity', 'revenue', 'tigo'
+            # الترتيب الداخلي الأصلي المستخرج من ملف الـ joblib بالظبط
+            original_fit_order = [
+                'montant', 'frequence_rech', 'revenue', 'arpu_segment', 'frequence',
+                'data_volume', 'on_net', 'orange', 'tigo', 'regularity', 'freq_top_pack',
+                'region_tower_count', 'region_avg_range', 'region_avg_samples',
+                'region_coverage_index', 'region_network_quality_score'
             ]
             
-            # تطبيق الترتيب
-            input_df = input_df[expected_order]
+            # فرض الترتيب الأصلي على الـ DataFrame
+            input_df = input_df[original_fit_order]
             
             # تنفيذ التنبؤ
             prediction = model.predict(input_df)[0]
